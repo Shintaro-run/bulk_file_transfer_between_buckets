@@ -1,8 +1,9 @@
 // const boxen = require('boxen');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
+const { listFiles } = require('../bucket');
 
-const PREFIX_PATTERN = /^(\/)?([a-z0-9-_.]+)\/(.*)$/;
+const GS_PATTERN = /^gs:\/\/([a-z0-9-_.]+)\/(.*)$/;
 
 module.exports = async () => {
   let done = false;
@@ -11,7 +12,7 @@ module.exports = async () => {
   while (!done) {
     const prompt = await inquirer.prompt({
       'type': 'input',
-      'name': 'filesToAvoid',
+      'name': 'url',
       'message': 'Enter a path to avoid..',
       'suffix': chalk.gray`Press enter to skip`,
       'validate': function (input) {
@@ -19,14 +20,19 @@ module.exports = async () => {
           return true;
         }
 
-        return PREFIX_PATTERN.test(input) || chalk`Input must match the format {bold /sub1/sub2/.}`;
+        return GS_PATTERN.test(input) || chalk`Input must match the format {bold gs://bucket/path/.}`;
       }
     });
 
-    if (prompt.filesToAvoid == '') {
+    if (prompt.url == '') {
       done = true;
     } else {
-      filesToAvoid.push({ path: prompt.filesToAvoid });
+      const gsUrl = GS_PATTERN.exec(prompt.url);
+
+      const files = await listFiles(gsUrl[1], gsUrl[2]);
+      files.map(file => {
+        filesToAvoid.push(file);
+      });
     }
   }
 

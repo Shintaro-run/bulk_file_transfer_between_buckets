@@ -46,7 +46,8 @@ module.exports = async () => {
     let filesToOperatePreFilter = await readFromCsv();
     spinner.stop();
 
-    let filesToAvoidPromptAnswers = await promptAvoid();
+    const filesToAvoidPromptAnswers = await promptAvoid();
+
     const csvWriteStatusAvoid = await writeToCsvAvoid(filesToAvoidPromptAnswers);
     if (!csvWriteStatusAvoid) {
       throw new Error('Unable to write files-to-avoid.csv.');
@@ -57,8 +58,8 @@ module.exports = async () => {
       const file = item.name;
 
       for (let index = 0; index < filesToAvoid.length; index++) {
-        const path = filesToAvoid[index].path;
-        if (file.startsWith(path)) {
+        const filename = filesToAvoid[index].path;
+        if (file.endsWith(filename)) {
           return false;
         }
       }
