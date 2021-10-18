@@ -76,7 +76,10 @@ module.exports = async () => {
 
 
     const numberOfFiles = await promptCount();
-    filesToOperate = filesToOperate.slice(0, numberOfFiles);
+
+    if (numberOfFiles > 0) {
+      filesToOperate = filesToOperate.slice(0, numberOfFiles);
+    }
 
     try {
       spinner.start('Verifying files');
