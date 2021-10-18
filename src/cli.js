@@ -14,6 +14,7 @@ const promptDestination = require('./prompts/prompt-destination');
 const promptConfirm = require('./prompts/prompt-confirm');
 const promptOperation = require('./prompts/prompt-operation');
 const promptAvoid = require('./prompts/prompt-avoid');
+const promptCount = require('./prompts/prompt-count');
 
 const limit = pLimit(100);
 const spinner = ora({ discardStdin: true });
@@ -72,6 +73,10 @@ module.exports = async () => {
     } else {
       spinner.succeed(`CSV loaded successfully. Working on ${filesToOperate.length} files.`);
     }
+
+
+    const numberOfFiles = await promptCount();
+    filesToOperate = filesToOperate.slice(0, numberOfFiles);
 
     try {
       spinner.start('Verifying files');

@@ -13,10 +13,10 @@ async function listFiles(bucket, path) {
     .map(file => {
       return {
         name: file.name.replace(path, '')
-      }
+      };
     })
     .filter(file => {
-      return file.name != '' && file.name != '/'
+      return file.name != '' && file.name != '/';
     });
 }
 
@@ -84,4 +84,4 @@ module.exports = {
   verifyFiles,
   copyFile,
   moveFile
-}
+};
