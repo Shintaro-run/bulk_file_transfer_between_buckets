@@ -52,15 +52,17 @@ module.exports = async () => {
      * FILTER - PATHS TO AVOID
      */
     const filesToAvoidPromptAnswers = await promptAvoid();
-
     const csvWriteStatusAvoid = await writeToCsvAvoid(filesToAvoidPromptAnswers);
     if (!csvWriteStatusAvoid) {
       throw new Error('Unable to write files-to-avoid.csv.');
     }
+
     const filesToAvoid = await readFromCsvAvoid();
+
     let filesToOperate = filesToOperatePreFilter.filter(item => {
       const file = item.name;
 
+      // Using a for-loop here to improve performance.
       for (let index = 0; index < filesToAvoid.length; index++) {
         const filename = filesToAvoid[index].path;
         if (file.endsWith(filename)) {
@@ -84,16 +86,19 @@ module.exports = async () => {
       });
     }
 
+    /**
+     * FILTER - NUMBER OF FILES
+     */
+    const numberOfFiles = await promptCount();
+
+    if (typeof numberOfFiles == 'number' && numberOfFiles > 0) {
+      filesToOperate = filesToOperate.slice(0, numberOfFiles);
+    }
+
     if (filesToOperate.length <= 0) {
       throw new Error('There are no files to operate');
     } else {
       spinner.succeed(`CSV loaded successfully. Working on ${filesToOperate.length} files.`);
-    }
-
-    const numberOfFiles = await promptCount();
-
-    if (numberOfFiles > 0) {
-      filesToOperate = filesToOperate.slice(0, numberOfFiles);
     }
 
     try {

@@ -7,6 +7,7 @@ module.exports = async () => {
     'name': 'number',
     'message': 'How many files to transfer?',
     'suffix': chalk.gray` (enter to skip)`,
+    'default': ''
   });
 
   return prompt.number;
