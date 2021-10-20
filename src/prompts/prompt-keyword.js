@@ -3,11 +3,11 @@ const chalk = require('chalk');
 
 module.exports = async () => {
   const prompt = await inquirer.prompt({
-    'type': 'number',
-    'name': 'number',
-    'message': 'How many files to transfer?',
+    'type': 'input',
+    'name': 'keyword',
+    'message': 'Keyword to filter by?',
     'suffix': chalk.gray` (enter to skip)`,
   });
 
-  return prompt.number;
+  return prompt.keyword;
 };

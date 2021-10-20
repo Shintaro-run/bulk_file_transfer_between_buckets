@@ -14,7 +14,7 @@ module.exports = async () => {
       'type': 'input',
       'name': 'url',
       'message': 'Enter a path to avoid..',
-      'suffix': chalk.gray`Press enter to skip`,
+      'suffix': chalk.gray` (enter to skip)`,
       'validate': function (input) {
         if (input == '') {
           return true;

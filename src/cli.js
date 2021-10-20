@@ -15,6 +15,7 @@ const promptConfirm = require('./prompts/prompt-confirm');
 const promptOperation = require('./prompts/prompt-operation');
 const promptAvoid = require('./prompts/prompt-avoid');
 const promptCount = require('./prompts/prompt-count');
+const promptKeyword = require('./prompts/prompt-keyword');
 
 const limit = pLimit(100);
 const spinner = ora({ discardStdin: true });
@@ -33,7 +34,6 @@ module.exports = async () => {
 
     spinner.start('Writing to CSV');
     const csvWriteStatus = await writeToCsv(sourceFileList);
-    // const csvWriteStatusAvoid = await writeToCsvAvoid();
 
     if (!csvWriteStatus) {
       throw new Error('Unable to write file.csv.');
@@ -47,6 +47,10 @@ module.exports = async () => {
     let filesToOperatePreFilter = await readFromCsv();
     spinner.stop();
 
+
+    /**
+     * FILTER - PATHS TO AVOID
+     */
     const filesToAvoidPromptAnswers = await promptAvoid();
 
     const csvWriteStatusAvoid = await writeToCsvAvoid(filesToAvoidPromptAnswers);
@@ -54,7 +58,6 @@ module.exports = async () => {
       throw new Error('Unable to write files-to-avoid.csv.');
     }
     const filesToAvoid = await readFromCsvAvoid();
-
     let filesToOperate = filesToOperatePreFilter.filter(item => {
       const file = item.name;
 
@@ -68,12 +71,24 @@ module.exports = async () => {
       return true;
     });
 
+    /**
+     * FILTER - KEYWORD
+     */
+    const keyword = await promptKeyword();
+
+    if (keyword && '' != keyword) {
+      filesToOperate = filesToOperate.filter(item => {
+        const file = item.name;
+
+        return file.includes(keyword);
+      });
+    }
+
     if (filesToOperate.length <= 0) {
       throw new Error('There are no files to operate');
     } else {
       spinner.succeed(`CSV loaded successfully. Working on ${filesToOperate.length} files.`);
     }
-
 
     const numberOfFiles = await promptCount();
 
